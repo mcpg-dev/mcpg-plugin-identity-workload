@@ -1,0 +1,28 @@
+schema: mcpg.dev/plugin/v1
+id: dev.mcpg.identity.workload
+name: SPIFFE Workload Identity Resolver
+license: BUSL-1.1
+description: |
+  Resolves caller identity from SPIFFE Verifiable Identity
+  Documents (SVIDs). Supports both formats: X.509-SVID
+  (validated against the trust bundle's CA roots, SPIFFE URI
+  read from the leaf's SubjectAltName) and JWT-SVID (validated
+  against the bundle's JWKS, SPIFFE ID read from `sub`). Trust-
+  domain enforcement, optional allowlist mode, and per-SPIFFE-ID
+  metadata. Bundle hot-reload via the shared bundle-reload
+  helper. SPIRE Workload API client (`/run/spire/sockets/agent.sock`
+  autoconnect) and federation across multiple trust domains
+  remain v0.2 follow-ups.
+class: identity_provider
+runtime: native-cdylib-v1
+protocol_version: "1.0"
+# Plugin advertises the maximum capability surface so operators
+# explicitly grant before deploying. The runtime plugin manifest
+# matches this exactly (descriptor↔manifest equality is a
+# load-time integrity check). Operators on JWT-only deployments
+# still grant both caps; the plugin only *consumes* them when
+# the actual `sources` config requests `x509_svid` (cert
+# acceptor) or `bundle.kind: workload_api` (Unix-socket client).
+required_capabilities:
+  - transport_listen
+  - network_outbound

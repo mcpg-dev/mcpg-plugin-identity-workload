@@ -1,0 +1,72 @@
+[package]
+name = "mcpg-plugin-identity-workload"
+version = "0.1.0-alpha.15"
+license = "BUSL-1.1"
+edition = "2024"
+description = "SPIFFE workload identity plugin for MCPG gateway (dev.mcpg.identity.workload)"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+mcpg-plugin-protocol = { git = "https://github.com/mcpg-dev/mcpg-plugin-protocol", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
+mcpg-cluster-api = { git = "https://github.com/mcpg-dev/mcpg-cluster-api", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
+mcpg-plugin-sdk = { git = "https://github.com/mcpg-dev/mcpg-plugin-sdk", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
+mcpg-bundle-reload = { git = "https://github.com/mcpg-dev/mcpg-bundle-reload", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13", default-features = false }
+async-trait = "0.1"
+# `cluster.publish` takes a `Bytes` payload (no copy on the FFI hot
+# path). Pulled in directly for the heartbeat publish on plugin
+# startup.
+bytes = "1"
+metrics = "0.24"
+sha2 = "0.10"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+tracing = "0.1"
+
+# JWT verification — same crate the OIDC plugin uses for JWKS-
+# backed JWT-SVID verification. Pure Rust, no openssl link.
+jsonwebtoken = { version = "10.4", default-features = false, features = ["aws_lc_rs", "use_pem"] }
+
+# X.509-SVID chain validation. rustls-webpki for the actual chain
+# verification (no openssl link, same crypto provider as
+# jsonwebtoken's aws_lc_rs feature). x509-parser for SAN URI
+# extraction since rustls-webpki intentionally doesn't expose
+# extension parsing.
+base64 = "0.22"
+rustls-pki-types = "1"
+rustls-webpki = { version = "0.103", default-features = false, features = ["std", "aws-lc-rs"] }
+x509-parser = "0.16"
+
+# SPIRE Workload API client mode (`bundle.kind: workload_api`).
+# Pulls X.509 + JWT trust bundles from the SPIRE agent's Unix
+# socket via gRPC and pushes updates as the agent rotates keys.
+# Pinned with both `x509-source` and `jwt-source` so the X509Source
+# + JwtSource builders are available for combined-bundle streaming.
+# tokio-stream is the streamer's `StreamExt::changed` glue.
+spiffe = { version = "0.14", default-features = false, features = ["x509-source", "jwt-source", "jwt-verify-aws-lc-rs"] }
+tokio-stream = "0.1"
+
+[dev-dependencies]
+# X.509-SVID test fixtures: synthesise a self-signed CA + leaf
+# with an arbitrary SPIFFE URI in SAN, deterministic enough to
+# unit-test chain validation without standing up a real SPIRE.
+rcgen = "0.14"
+# rcgen builds OffsetDateTime values via the `time` crate; we use
+# them directly when shaping not_before / not_after on test leaf
+# certs.
+time = "0.3"
+# End-to-end resolve() tests write a synthesised SPIFFE bundle
+# file to disk and point the plugin at it.
+tempfile = "3"
+
+[features]
+default = ["cdylib-export"]
+cdylib-export = []
+# Declared so the SDK's `declare_identity_plugin!` `build_static`
+# accessor (gated `#[cfg(feature = "static-firstparty")]`) does not
+# trigger `unexpected_cfgs` in consumer compilation. Empty: this plugin
+# is consumed as a cdylib, not via the static-firstparty fast path.
+static-firstparty = []
