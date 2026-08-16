@@ -104,7 +104,7 @@ fn record_resolve_outcome(result: &IdentityResolution, elapsed: std::time::Durat
             elapsed_ms = %elapsed.as_millis(),
             "workload identity: no SVID — fall through"
         ),
-        IdentityResolution::Invalid { reason } => warn!(
+        IdentityResolution::Invalid { reason, .. } => warn!(
             reason = %reason,
             elapsed_ms = %elapsed.as_millis(),
             "workload identity: SVID validation failed"
@@ -1043,6 +1043,7 @@ fn build_resolution(
     {
         return IdentityResolution::Invalid {
             reason: format!("SPIFFE ID not in allowlist: `{spiffe_id}`"),
+            response_headers: Vec::new(),
         };
     }
 
@@ -1109,6 +1110,7 @@ fn resolve(
     if let Some(reason) = last_invalid {
         IdentityResolution::Invalid {
             reason: format!("SPIFFE: {reason}"),
+            response_headers: Vec::new(),
         }
     } else {
         IdentityResolution::None
@@ -1500,7 +1502,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(
                     reason.contains("other.example") && reason.contains("example.org"),
                     "expected dispatch error naming both trust domains, got: {reason}",
@@ -1582,7 +1584,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(reason.contains("x509-svid"), "got: {reason}");
             }
             other => panic!("expected Invalid, got {other:?}"),
@@ -1639,7 +1641,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(reason.contains("not in allowlist"), "got: {reason}");
             }
             other => panic!("expected Invalid, got {other:?}"),
@@ -1869,7 +1871,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(
                     reason.contains("unknown.example"),
                     "expected unknown-domain in error, got: {reason}",
@@ -1909,7 +1911,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(
                     reason.contains("x509-svid"),
                     "expected chain-validation reason, got: {reason}",
@@ -1981,7 +1983,7 @@ mod tests {
         };
         let outcome = resolve(&plugin.inner, &[], &metadata);
         match outcome {
-            IdentityResolution::Invalid { reason } => {
+            IdentityResolution::Invalid { reason, .. } => {
                 assert!(reason.contains("not in allowlist"), "got: {reason}",);
             }
             other => panic!("expected Invalid (allowlist), got {other:?}"),

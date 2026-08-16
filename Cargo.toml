@@ -1,6 +1,6 @@
 [package]
 name = "mcpg-plugin-identity-workload"
-version = "0.1.0-alpha.15"
+version = "0.1.0-alpha.16"
 license = "BUSL-1.1"
 edition = "2024"
 description = "SPIFFE workload identity plugin for MCPG gateway (dev.mcpg.identity.workload)"
@@ -9,10 +9,10 @@ description = "SPIFFE workload identity plugin for MCPG gateway (dev.mcpg.identi
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-mcpg-plugin-protocol = { git = "https://github.com/mcpg-dev/mcpg-plugin-protocol", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
-mcpg-cluster-api = { git = "https://github.com/mcpg-dev/mcpg-cluster-api", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
-mcpg-plugin-sdk = { git = "https://github.com/mcpg-dev/mcpg-plugin-sdk", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13" }
-mcpg-bundle-reload = { git = "https://github.com/mcpg-dev/mcpg-bundle-reload", tag = "v0.1.0-beta.13", version = "=0.1.0-beta.13", default-features = false }
+mcpg-plugin-protocol = { git = "https://github.com/mcpg-dev/mcpg-plugin-protocol", tag = "v0.1.0-beta.14", version = "=0.1.0-beta.14" }
+mcpg-cluster-api = { git = "https://github.com/mcpg-dev/mcpg-cluster-api", tag = "v0.1.0-beta.14", version = "=0.1.0-beta.14" }
+mcpg-plugin-sdk = { git = "https://github.com/mcpg-dev/mcpg-plugin-sdk", tag = "v0.1.0-beta.14", version = "=0.1.0-beta.14" }
+mcpg-bundle-reload = { git = "https://github.com/mcpg-dev/mcpg-bundle-reload", tag = "v0.1.0-beta.14", version = "=0.1.0-beta.14", default-features = false }
 async-trait = "0.1"
 # `cluster.publish` takes a `Bytes` payload (no copy on the FFI hot
 # path). Pulled in directly for the heartbeat publish on plugin
