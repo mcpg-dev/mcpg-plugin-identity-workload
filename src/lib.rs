@@ -535,7 +535,7 @@ fn fingerprint_file(path: &str) -> Result<String, ReloadError> {
     hasher.update(path.as_bytes());
     hasher.update(b"\x00");
     hasher.update(&bytes);
-    Ok(format!("{:x}", hasher.finalize()))
+    Ok(hex::encode(hasher.finalize()))
 }
 
 /// Parse a SPIFFE Trust Domain Bundle (or legacy JWKS) file.

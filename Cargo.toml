@@ -1,6 +1,6 @@
 [package]
 name = "mcpg-plugin-identity-workload"
-version = "0.1.0-alpha.31"
+version = "0.1.0-alpha.37"
 license = "BUSL-1.1"
 edition = "2024"
 description = "SPIFFE workload identity plugin for MCPG gateway (dev.mcpg.identity.workload)"
@@ -9,17 +9,18 @@ description = "SPIFFE workload identity plugin for MCPG gateway (dev.mcpg.identi
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-mcpg-plugin-protocol = { git = "https://github.com/mcpg-dev/mcpg-plugin-protocol", tag = "v0.1.0-beta.29", version = "=0.1.0-beta.29" }
-mcpg-cluster-api = { git = "https://github.com/mcpg-dev/mcpg-cluster-api", tag = "v0.1.0-beta.29", version = "=0.1.0-beta.29" }
-mcpg-plugin-sdk = { git = "https://github.com/mcpg-dev/mcpg-plugin-sdk", tag = "v0.1.0-beta.30", version = "=0.1.0-beta.30" }
-mcpg-bundle-reload = { git = "https://github.com/mcpg-dev/mcpg-bundle-reload", tag = "v0.1.0-beta.28", version = "=0.1.0-beta.28", default-features = false }
+mcpg-plugin-protocol = { git = "https://github.com/mcpg-dev/mcpg-plugin-protocol", tag = "v0.1.0-beta.35", version = "=0.1.0-beta.35" }
+mcpg-cluster-api = { git = "https://github.com/mcpg-dev/mcpg-cluster-api", tag = "v0.1.0-beta.35", version = "=0.1.0-beta.35" }
+mcpg-plugin-sdk = { git = "https://github.com/mcpg-dev/mcpg-plugin-sdk", tag = "v0.1.0-beta.36", version = "=0.1.0-beta.36" }
+mcpg-bundle-reload = { git = "https://github.com/mcpg-dev/mcpg-bundle-reload", tag = "v0.1.0-beta.34", version = "=0.1.0-beta.34", default-features = false }
 async-trait = "0.1"
 # `cluster.publish` takes a `Bytes` payload (no copy on the FFI hot
 # path). Pulled in directly for the heartbeat publish on plugin
 # startup.
 bytes = "1"
 metrics = "0.24"
-sha2 = "0.10"
+hex = "0.4"
+sha2 = "0.11"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -28,17 +29,17 @@ tracing = "0.1"
 
 # JWT verification — same crate the OIDC plugin uses for JWKS-
 # backed JWT-SVID verification. Pure Rust, no openssl link.
-jsonwebtoken = { version = "10.4", default-features = false, features = ["aws_lc_rs", "use_pem"] }
+jsonwebtoken = { version = "11.1", default-features = false, features = ["aws_lc_rs", "use_pem"] }
 
 # X.509-SVID chain validation. rustls-webpki for the actual chain
 # verification (no openssl link, same crypto provider as
 # jsonwebtoken's aws_lc_rs feature). x509-parser for SAN URI
 # extraction since rustls-webpki intentionally doesn't expose
 # extension parsing.
-base64 = "0.22"
+base64 = "0.23"
 rustls-pki-types = "1"
 rustls-webpki = { version = "0.103", default-features = false, features = ["std", "aws-lc-rs"] }
-x509-parser = "0.16"
+x509-parser = "0.18"
 
 # SPIRE Workload API client mode (`bundle.kind: workload_api`).
 # Pulls X.509 + JWT trust bundles from the SPIRE agent's Unix
@@ -46,7 +47,7 @@ x509-parser = "0.16"
 # Pinned with both `x509-source` and `jwt-source` so the X509Source
 # + JwtSource builders are available for combined-bundle streaming.
 # tokio-stream is the streamer's `StreamExt::changed` glue.
-spiffe = { version = "0.14", default-features = false, features = ["x509-source", "jwt-source", "jwt-verify-aws-lc-rs"] }
+spiffe = { version = "0.16", default-features = false, features = ["x509-source", "jwt-source", "jwt-verify-aws-lc-rs"] }
 tokio-stream = "0.1"
 
 [dev-dependencies]

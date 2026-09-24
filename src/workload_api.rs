@@ -294,7 +294,7 @@ fn fingerprint_bundle(bundle: &ParsedBundle) -> String {
         hasher.update(kid.as_bytes());
         hasher.update(b"\x00");
     }
-    format!("{:x}", hasher.finalize())
+    hex::encode(hasher.finalize())
 }
 
 #[derive(Debug, thiserror::Error)]
